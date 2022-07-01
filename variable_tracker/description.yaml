@@ -1,0 +1,10 @@
+Type: Jupyter Notebook Extension
+Compatibility: 3.x, 4.x, 5.x, 6.x
+Name: Variable Tracker
+Main: main.js
+Link: README.md
+Description: |
+  Helps in keeping track of the functions applied to a variable.
+  Helpful when the cell blocks are run discontiniously.
+Parameters:
+- none
