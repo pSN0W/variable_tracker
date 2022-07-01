@@ -13,6 +13,7 @@ define(
 				m = re.exec(s);
 				if (m) {
 					variable_to_track = m[1];
+                    variable_to_track = variable_to_track.split(',');
                     Jupyter.notebook
 						.insert_cell_below('markdown')
 						.set_text(`Tracking Variable : ${variable_to_track}`);
@@ -89,7 +90,7 @@ with open("context.txt",'w') as f:
 		function check_if_variable_is_changed(data) {
 			return (
 				data.includes('=') &&
-				data.split('=')[0].includes(variable_to_track)
+				variable_to_track.some(v => data.split('=')[0].includes(v))
 			);
 		}
 
