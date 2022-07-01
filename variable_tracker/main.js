@@ -21,6 +21,14 @@ define(
 			} while (m);
         }
 
+        function display_tracking_variable(data){
+            if(data.includes("display_tracking_variable")){
+                Jupyter.notebook
+					.insert_cell_below('markdown')
+					.set_text(`Tracking Variable : ${variable_to_track}`);
+            }
+        }
+
         function force_track(data,index,list){
             if(data.includes("force_track")) {
                 index++;
@@ -141,6 +149,7 @@ with open("context.txt",'w') as f:
 							search_for_variable_to_track(data);
 							// console.log(variable_to_track);
 							// deal with display_tracking_variable
+                            display_tracking_variable(data);
 							// deal with force_track
 							if (force_track(data, i, cell_data_list)) {
 								break;
