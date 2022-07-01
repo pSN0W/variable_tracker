@@ -13,7 +13,9 @@ define(
 				m = re.exec(s);
 				if (m) {
 					variable_to_track = m[1];
-                    // console.log("Found match",m[1]);
+                    Jupyter.notebook
+						.insert_cell_below('markdown')
+						.set_text(`Tracking Variable : ${variable_to_track}`);
 				}
 			} while (m);
         }
