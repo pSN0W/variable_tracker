@@ -37,6 +37,22 @@ define(
 			} while (m);
 		}
 
+        function remove_variables(s) {
+			const re = /\s*#+\s*track_variable_remove\((.*)\).*/g;
+			let m;
+			do {
+				m = re.exec(s);
+				if (m) {
+					let provided_variable = m[1];
+					provided_variable = provided_variable.trim().split(',');
+					variable_to_track = variable_to_track.filter(v=>!provided_variable.includes(v));
+					Jupyter.notebook
+						.insert_cell_below('markdown')
+						.set_text(`Tracking Variable : ${variable_to_track}`);
+				}
+			} while (m);
+		}
+
         function display_tracking_variable(data){
             if(data.includes("display_tracking_variable")){
                 Jupyter.notebook
@@ -166,20 +182,27 @@ with open("context.txt",'w') as f:
                             // deal with track_variable_add(df_col)
                             add_variables(data);
 
+                            // deal with track_variable_remove(df)
+                            remove_variables(data);
+
 							// deal with display_tracking_variable
                             display_tracking_variable(data);
+
 							// deal with force_track
 							if (force_track(data, i, cell_data_list)) {
 								break;
 							}
+
 							// deal with skip_track
 							if (skip_track(data)) {
 								break;
 							}
+
 							// deal with save_tracking_result
 							if (save_tracking_result(data)) {
 								break;
 							}
+                            
 							// deal with display_tracking_result
 							if (display_tracking_result(data)) {
 								break;
