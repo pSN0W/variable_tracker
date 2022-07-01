@@ -64,6 +64,15 @@ define(
             }
         }
 
+        function end_track(data) {
+			if (data.includes('end_track')) {
+                variable_to_track = [];
+				Jupyter.notebook
+					.insert_cell_below('markdown')
+					.set_text(`Tracking Variable : ${variable_to_track}`);
+			}
+		}
+
         function force_track(data,index,list){
             if(data.includes("force_track")) {
                 index++;
@@ -217,6 +226,9 @@ with open("context.txt",'w') as f:
 							if (display_tracking_result(data)) {
 								break;
 							}
+
+                            // deals with end_track
+                            end_track(data);
 						} else if (variable_to_track.length > 0) {
                             console.log(
 								'In printing function',
