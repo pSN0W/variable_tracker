@@ -3,7 +3,7 @@ define(
         'base/js/namespace'
     ],
     function (Jupyter) {
-        let variable_to_track = null;
+        let variable_to_track = [];
         let tracking_result = "";
 
         function search_for_variable_to_track(s) {
@@ -14,37 +14,40 @@ define(
 				if (m) {
 					variable_to_track = m[1];
                     variable_to_track = variable_to_track.trim().split(',');
+                    variable_to_track = variable_to_track.filter(x=>x.length>0);
                     Jupyter.notebook
-						.insert_cell_below('markdown')
-						.set_text(`Tracking Variable : ${variable_to_track}`);
+                    .insert_cell_below('markdown')
+                    .set_text(`Tracking Variable : ${variable_to_track}`);
 				}
 			} while (m);
         }
-
+        
         function add_variables(s) {
-			const re = /\s*#+\s*track_variable_add\((.*)\).*/g;
+            const re = /\s*#+\s*track_variable_add\((.*)\).*/g;
 			let m;
 			do {
-				m = re.exec(s);
+                m = re.exec(s);
 				if (m) {
-					let provided_variable = m[1];
+                    let provided_variable = m[1];
 					provided_variable = provided_variable.trim().split(',');
+                    provided_variable = provided_variable.filter(x=>x.length>0);
                     variable_to_track = [...new Set([...variable_to_track,...provided_variable])];
 					Jupyter.notebook
-						.insert_cell_below('markdown')
-						.set_text(`Tracking Variable : ${variable_to_track}`);
+                    .insert_cell_below('markdown')
+                    .set_text(`Tracking Variable : ${variable_to_track}`);
 				}
 			} while (m);
 		}
-
+        
         function remove_variables(s) {
-			const re = /\s*#+\s*track_variable_remove\((.*)\).*/g;
+            const re = /\s*#+\s*track_variable_remove\((.*)\).*/g;
 			let m;
 			do {
-				m = re.exec(s);
+                m = re.exec(s);
 				if (m) {
-					let provided_variable = m[1];
+                    let provided_variable = m[1];
 					provided_variable = provided_variable.trim().split(',');
+                    provided_variable = provided_variable.filter(x=>x.length>0);
 					variable_to_track = variable_to_track.filter(v=>!provided_variable.includes(v));
 					Jupyter.notebook
 						.insert_cell_below('markdown')
@@ -130,7 +133,14 @@ with open("context.txt",'w') as f:
 		function check_if_variable_is_changed(data) {
 			return (
 				data.includes('=') &&
-				variable_to_track.some(v => data.split('=')[0].includes(v))
+				variable_to_track
+                    .some(
+                        v => data
+                                .split('=')[0]
+                                .split(',')
+                                .map(x=>x.trim())
+                                .includes(v)
+                    )
 			);
 		}
 
@@ -202,12 +212,17 @@ with open("context.txt",'w') as f:
 							if (save_tracking_result(data)) {
 								break;
 							}
-                            
+
 							// deal with display_tracking_result
 							if (display_tracking_result(data)) {
 								break;
 							}
-						} else if (variable_to_track) {
+						} else if (variable_to_track.length > 0) {
+                            console.log(
+								'In printing function',
+								variable_to_track.length,
+								variable_to_track
+							);
 							// skip a function
 							if (data.startsWith('def')) {
 								i = skip_succeding_indentation(
@@ -225,7 +240,7 @@ with open("context.txt",'w') as f:
 								);
 								continue;
 							}
-							console.log(data);
+							// console.log(data);
 						}
 						i += 1;
 					}
