@@ -110,61 +110,80 @@ with open("context.txt",'w') as f:
 		}
 
         function load_ipython_extension() {
-            Jupyter.notebook.events.on('execute.CodeCell', function(evt, data) {
-                // data.cell is the cell object
-                const notebook_cell = data.cell;
-                // console.log('EXTENSION: executing a cell');
-                const cell_data = notebook_cell.get_text();
-                //console.log(cell_data);
-                const cell_data_list = cell_data.split('\n');
-                //console.log(cell_data_list);
-                let i = 0;
-                while (i < cell_data_list.length) {
-                    const data = cell_data_list[i];
-                    //console.log(data);
-                    if(data.trim().startsWith('#')){
-                        // deal with track_variable(df)
-                        // console.log("Searching for tracking for comment line");
-                        search_for_variable_to_track(data);
-                        // console.log(variable_to_track);
-                        // deal with display_tracking_variable
-                        // deal with force_track
-                        if(force_track(data,i,cell_data_list)) {
-                            break;
+            Jupyter.notebook.events.on(
+				'finished_execute.CodeCell',
+				function (evt, data) {
+					// console.log(evt.is_success());
+					// data.cell is the cell object
+					const notebook_cell = data.cell;
+					// console.log('EXTENSION: executing a cell');
+
+                    console.log(
+						notebook_cell.output_area.outputs
+					);
+                    if(notebook_cell.output_area.outputs.length>0 
+                        && notebook_cell.output_area.outputs[0].output_type === "error" ){
+                            console.log("error");
+                            return;
                         }
-                        // deal with skip_track
-                        if(skip_track(data)){
-                            break;
-                        }
-                        // deal with save_tracking_result
-                        if(save_tracking_result(data)){
-                            break;
-                        }
-                        // deal with display_tracking_result
-                        if(display_tracking_result(data)){
-                            break;
-                        }
-                    } else if(variable_to_track){
-                        // skip a function
-                        if(data.startsWith("def")) {
-                            i = skip_succeding_indentation(i,cell_data_list);
-                            continue;
-                        }
-                        // append if it makes a change to variable you are tracking
-                        // put everything inside loop
-                        if (check_if_variable_is_changed(data)) {
-                            i = append_to_tracking_result(i,cell_data_list);
-                            continue;
-                        }
-                        console.log(data);
-                    }
-                    i+=1;
-                }
-                // if(variable_to_track){
-                //     console.log(cell_data);
-                // } 
-                console.log(tracking_result);
-            });
+					const cell_data = notebook_cell.get_text();
+					//console.log(cell_data);
+					const cell_data_list = cell_data.split('\n');
+					//console.log(cell_data_list);
+					let i = 0;
+					while (i < cell_data_list.length) {
+						const data = cell_data_list[i];
+						//console.log(data);
+						if (data.trim().startsWith('#')) {
+							// deal with track_variable(df)
+							// console.log("Searching for tracking for comment line");
+							search_for_variable_to_track(data);
+							// console.log(variable_to_track);
+							// deal with display_tracking_variable
+							// deal with force_track
+							if (force_track(data, i, cell_data_list)) {
+								break;
+							}
+							// deal with skip_track
+							if (skip_track(data)) {
+								break;
+							}
+							// deal with save_tracking_result
+							if (save_tracking_result(data)) {
+								break;
+							}
+							// deal with display_tracking_result
+							if (display_tracking_result(data)) {
+								break;
+							}
+						} else if (variable_to_track) {
+							// skip a function
+							if (data.startsWith('def')) {
+								i = skip_succeding_indentation(
+									i,
+									cell_data_list
+								);
+								continue;
+							}
+							// append if it makes a change to variable you are tracking
+							// put everything inside loop
+							if (check_if_variable_is_changed(data)) {
+								i = append_to_tracking_result(
+									i,
+									cell_data_list
+								);
+								continue;
+							}
+							console.log(data);
+						}
+						i += 1;
+					}
+					// if(variable_to_track){
+					//     console.log(cell_data);
+					// }
+					console.log(tracking_result);
+				}
+			);
         }
 
         return {
