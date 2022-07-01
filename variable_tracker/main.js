@@ -43,6 +43,20 @@ define(
             return false;
         }
 
+        function save_tracking_result(data) {
+			if (data.includes('save_tracking_result')) {
+				Jupyter.notebook
+					.insert_cell_below('code')
+					.set_text(`
+tracking_data = """${tracking_result}"""
+with open("context.txt",'w') as f:
+    f.write(tracking_data)
+                    `);
+				return true;
+			}
+			return false;
+		}
+
         function skip_succeding_indentation(index, list) {
 			index++;
 			while (index < list.length && list[index].startsWith(' ')) {
@@ -120,7 +134,10 @@ define(
                         if(skip_track(data)){
                             break;
                         }
-                        // deal with save_track
+                        // deal with save_tracking_result
+                        if(save_tracking_result(data)){
+                            break;
+                        }
                         // deal with display_tracking_result
                         if(display_tracking_result(data)){
                             break;
