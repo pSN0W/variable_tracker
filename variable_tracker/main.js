@@ -33,6 +33,16 @@ define(
             return data.includes("skip_track");
         }
 
+        function display_tracking_result(data){
+            if(data.includes("display_tracking_result")){
+                Jupyter.notebook
+					.insert_cell_below('markdown')
+					.set_text(tracking_result);
+                return true;
+            }
+            return false;
+        }
+
         function skip_succeding_indentation(index, list) {
 			index++;
 			while (index < list.length && list[index].startsWith(' ')) {
@@ -112,6 +122,9 @@ define(
                         }
                         // deal with save_track
                         // deal with display_tracking_result
+                        if(display_tracking_result(data)){
+                            break;
+                        }
                     } else if(variable_to_track){
                         // skip a function
                         if(data.startsWith("def")) {
