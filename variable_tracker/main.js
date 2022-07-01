@@ -13,13 +13,29 @@ define(
 				m = re.exec(s);
 				if (m) {
 					variable_to_track = m[1];
-                    variable_to_track = variable_to_track.split(',');
+                    variable_to_track = variable_to_track.trim().split(',');
                     Jupyter.notebook
 						.insert_cell_below('markdown')
 						.set_text(`Tracking Variable : ${variable_to_track}`);
 				}
 			} while (m);
         }
+
+        function add_variables(s) {
+			const re = /\s*#+\s*track_variable_add\((.*)\).*/g;
+			let m;
+			do {
+				m = re.exec(s);
+				if (m) {
+					let provided_variable = m[1];
+					provided_variable = provided_variable.trim().split(',');
+                    variable_to_track = [...new Set([...variable_to_track,...provided_variable])];
+					Jupyter.notebook
+						.insert_cell_below('markdown')
+						.set_text(`Tracking Variable : ${variable_to_track}`);
+				}
+			} while (m);
+		}
 
         function display_tracking_variable(data){
             if(data.includes("display_tracking_variable")){
@@ -145,9 +161,11 @@ with open("context.txt",'w') as f:
 						//console.log(data);
 						if (data.trim().startsWith('#')) {
 							// deal with track_variable(df)
-							// console.log("Searching for tracking for comment line");
 							search_for_variable_to_track(data);
-							// console.log(variable_to_track);
+
+                            // deal with track_variable_add(df_col)
+                            add_variables(data);
+
 							// deal with display_tracking_variable
                             display_tracking_variable(data);
 							// deal with force_track
