@@ -24,7 +24,13 @@ define(
                 const current_string = list.slice(index).join('\n');
 				tracking_result += current_string;
 				tracking_result += '\n';
+                return true;
             }
+            return false;
+        }
+
+        function skip_track(data) {
+            return data.includes("skip_track");
         }
 
         function skip_succeding_indentation(index, list) {
@@ -101,6 +107,9 @@ define(
                             break;
                         }
                         // deal with skip_track
+                        if(skip_track(data)){
+                            break;
+                        }
                         // deal with save_track
                         // deal with display_tracking_result
                     } else if(variable_to_track){
