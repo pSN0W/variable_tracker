@@ -1,3 +1,3 @@
-# variable_tracker
-A Jupyter Notebook extension to keep track of changes made to a variable in the order they were run
-This project is still under construction
+Variable Tracker
+==================
+The initial aim here is to just log the content of the currenltly ran cell to the console.

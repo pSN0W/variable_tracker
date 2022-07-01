@@ -173,27 +173,18 @@ with open("context.txt",'w') as f:
             Jupyter.notebook.events.on(
 				'finished_execute.CodeCell',
 				function (evt, data) {
-					// console.log(evt.is_success());
 					// data.cell is the cell object
 					const notebook_cell = data.cell;
-					// console.log('EXTENSION: executing a cell');
 
-                    console.log(
-						notebook_cell.output_area.outputs
-					);
                     if(notebook_cell.output_area.outputs.length>0 
                         && notebook_cell.output_area.outputs[0].output_type === "error" ){
-                            console.log("error");
                             return;
                         }
 					const cell_data = notebook_cell.get_text();
-					//console.log(cell_data);
 					const cell_data_list = cell_data.split('\n');
-					//console.log(cell_data_list);
 					let i = 0;
 					while (i < cell_data_list.length) {
 						const data = cell_data_list[i];
-						//console.log(data);
 						if (data.trim().startsWith('#')) {
 							// deal with track_variable(df)
 							search_for_variable_to_track(data);
@@ -230,11 +221,6 @@ with open("context.txt",'w') as f:
                             // deals with end_track
                             end_track(data);
 						} else if (variable_to_track.length > 0) {
-                            console.log(
-								'In printing function',
-								variable_to_track.length,
-								variable_to_track
-							);
 							// skip a function
 							if (data.startsWith('def')) {
 								i = skip_succeding_indentation(
@@ -243,6 +229,7 @@ with open("context.txt",'w') as f:
 								);
 								continue;
 							}
+
 							// append if it makes a change to variable you are tracking
 							// put everything inside loop
 							if (check_if_variable_is_changed(data)) {
@@ -252,14 +239,9 @@ with open("context.txt",'w') as f:
 								);
 								continue;
 							}
-							// console.log(data);
 						}
 						i += 1;
 					}
-					// if(variable_to_track){
-					//     console.log(cell_data);
-					// }
-					console.log(tracking_result);
 				}
 			);
         }
