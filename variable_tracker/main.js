@@ -13,9 +13,18 @@ define(
 				m = re.exec(s);
 				if (m) {
 					variable_to_track = m[1];
-                    console.log("Found match",m[1]);
+                    // console.log("Found match",m[1]);
 				}
 			} while (m);
+        }
+
+        function force_track(data,index,list){
+            if(data.includes("force_track")) {
+                index++;
+                const current_string = list.slice(index).join('\n');
+				tracking_result += current_string;
+				tracking_result += '\n';
+            }
         }
 
         function skip_succeding_indentation(index, list) {
@@ -85,9 +94,12 @@ define(
                         // deal with track_variable(df)
                         // console.log("Searching for tracking for comment line");
                         search_for_variable_to_track(data);
-                        console.log(variable_to_track);
+                        // console.log(variable_to_track);
                         // deal with display_tracking_variable
                         // deal with force_track
+                        if(force_track(data,i,cell_data_list)) {
+                            break;
+                        }
                         // deal with skip_track
                         // deal with save_track
                         // deal with display_tracking_result
