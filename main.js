@@ -140,16 +140,26 @@ with open("context.txt",'w') as f:
 		}
 
 		function check_if_variable_is_changed(data) {
-			return (
-				data.includes('=') &&
-				variable_to_track
-                    .some(
-                        v => data
-                                .split('=')[0]
-                                .split(',')
-                                .map(x=>x.trim())
-                                .includes(v)
-                    )
+			if (!data.includes('=')) {
+				return false;
+			}
+			let all_variables = data
+				.split('=')[0]
+				.split(',')
+				.map((x) => x.trim());
+			function check_for_equality(k, v) {
+				if (k.length < v.length) {
+					return false;
+				} else if (k.length === v.length) {
+					return k === v;
+				} else {
+					return (
+						k.slice(0, v.length) === v && '.['.includes(k[v.length])
+					);
+				}
+			}
+			return variable_to_track.some((v) =>
+				all_variables.some((k) => check_for_equality(k, v))
 			);
 		}
 
